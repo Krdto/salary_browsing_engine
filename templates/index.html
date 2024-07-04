@@ -113,14 +113,30 @@
                         success: function(data) {
                             var resultsDiv = $('#results');
                             resultsDiv.empty();
-                            if (data.salaries.length) {
-                                resultsDiv.append('<h4>Results for ' + data.corrected_job_title + ':</h4>');
-                                data.salaries.forEach(function(item) {
-                                    resultsDiv.append(
+                            
+                            // Group salaries by corrected_job_titles
+                            var groupedResults = {};
+                            data.corrected_job_titles.forEach(function(title, index) {
+                                if (!groupedResults[title]) {
+                                    groupedResults[title] = [];
+                                }
+                                groupedResults[title].push(data.salaries[index]);
+                            });
+                            
+                            // Display results
+                            Object.keys(groupedResults).forEach(function(title) {
+                                var jobResults = groupedResults[title];
+                                var container = $('<div class="job-results"></div>');
+                                container.append('<h4>Results for ' + title + ':</h4>');
+                                jobResults.forEach(function(item) {
+                                    container.append(
                                         '<div class="result-item"><p><strong>' + item[0] + '</strong> - ' + item[1] + ' ' + item[2] + '</p></div>'
                                     );
                                 });
-                            } else {
+                                resultsDiv.append(container);
+                            });
+                            
+                            if (Object.keys(groupedResults).length === 0) {
                                 resultsDiv.append(
                                     '<div class="alert alert-warning">No data found for the given job title.</div>'
                                 );
@@ -131,7 +147,7 @@
                     $('#results').empty();
                 }
             });
-
+    
             $('#search-form').on('submit', function(event) {
                 event.preventDefault();
                 var jobTitle = $('#job_title').val();
@@ -142,14 +158,30 @@
                     success: function(data) {
                         var resultsDiv = $('#results');
                         resultsDiv.empty();
-                        if (data.salaries.length) {
-                            resultsDiv.append('<h4>Results for ' + data.corrected_job_title + ':</h4>');
-                            data.salaries.forEach(function(item) {
-                                resultsDiv.append(
+                        
+                        // Group salaries by corrected_job_titles
+                        var groupedResults = {};
+                        data.corrected_job_titles.forEach(function(title, index) {
+                            if (!groupedResults[title]) {
+                                groupedResults[title] = [];
+                            }
+                            groupedResults[title].push(data.salaries[index]);
+                        });
+                        
+                        // Display results
+                        Object.keys(groupedResults).forEach(function(title) {
+                            var jobResults = groupedResults[title];
+                            var container = $('<div class="job-results"></div>');
+                            container.append('<h4>Results for ' + title + ':</h4>');
+                            jobResults.forEach(function(item) {
+                                container.append(
                                     '<div class="result-item"><p><strong>' + item[0] + '</strong> - ' + item[1] + ' ' + item[2] + '</p></div>'
                                 );
                             });
-                        } else {
+                            resultsDiv.append(container);
+                        });
+                        
+                        if (Object.keys(groupedResults).length === 0) {
                             resultsDiv.append(
                                 '<div class="alert alert-warning">No data found for the given job title.</div>'
                             );
@@ -158,6 +190,6 @@
                 });
             });
         });
-    </script>
+    </script>    
 </body>
 </html>
