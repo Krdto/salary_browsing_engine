@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, jsonify, flash
 import pandas as pd
 from fuzzywuzzy import process
+from currency_converter import CurrencyConverter
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
 EXCEL_FILE = 'excelBE.xlsx'
 df = pd.read_excel(EXCEL_FILE)
+c = CurrencyConverter()
 
 def get_salaries(job_title):
     choices = df['job title'].tolist()
@@ -14,7 +16,13 @@ def get_salaries(job_title):
     if best_match:
         corrected_job_title = best_match[0]
         filtered_df = df[df['job title'] == corrected_job_title]
-        salaries = filtered_df[['country', 'salary', 'currency']].values.tolist()
+        salaries = []
+        for index, row in filtered_df.iterrows():
+            salary = row['salary']
+            currency = row['currency']
+            if currency != 'EUR':
+                salary = c.convert(salary, currency, 'EUR')
+            salaries.append([row['country'], round(salary, 2), 'EUR'])
         return corrected_job_title, salaries
     else:
         return job_title, []
