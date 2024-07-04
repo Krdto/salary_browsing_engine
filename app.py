@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, flash
 import pandas as pd
+from fuzzywuzzy import process
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -8,12 +9,15 @@ EXCEL_FILE = 'excelBE.xlsx'
 df = pd.read_excel(EXCEL_FILE)
 
 def get_salaries(job_title):
-    filtered_df = df[df['job title'].str.contains(job_title, case=False, na=False)]
-    if not filtered_df.empty:
+    choices = df['job title'].tolist()
+    best_match = process.extractOne(job_title, choices, score_cutoff=60)
+    if best_match:
+        corrected_job_title = best_match[0]
+        filtered_df = df[df['job title'] == corrected_job_title]
         salaries = filtered_df[['country', 'salary', 'currency']].values.tolist()
-        return salaries
+        return corrected_job_title, salaries
     else:
-        return []
+        return job_title, []
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -22,8 +26,8 @@ def index():
 @app.route('/search', methods=['POST'])
 def search():
     job_title = request.form['job_title']
-    salaries = get_salaries(job_title)
-    return jsonify(salaries)
+    corrected_job_title, salaries = get_salaries(job_title)
+    return jsonify({'corrected_job_title': corrected_job_title, 'salaries': salaries})
 
 if __name__ == '__main__':
     app.run(debug=True)

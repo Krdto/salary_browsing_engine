@@ -95,6 +95,7 @@
                     <div class="form-group">
                         <input type="text" class="form-control" id="job_title" name="job_title" placeholder="Enter job title" required>
                     </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
                 </form>
                 <div class="results" id="results"></div>
             </div>
@@ -105,6 +106,36 @@
         $(document).ready(function() {
             $('#job_title').on('input', function() {
                 var jobTitle = $(this).val();
+                if (jobTitle.length > 1) {
+                    $.ajax({
+                        url: '/search',
+                        method: 'POST',
+                        data: { job_title: jobTitle },
+                        success: function(data) {
+                            var resultsDiv = $('#results');
+                            resultsDiv.empty();
+                            if (data.salaries.length) {
+                                resultsDiv.append('<h4>Results for ' + data.corrected_job_title + ':</h4>');
+                                data.salaries.forEach(function(item) {
+                                    resultsDiv.append(
+                                        '<div class="result-item"><p><strong>' + item[0] + '</strong> - ' + item[1] + ' ' + item[2] + '</p></div>'
+                                    );
+                                });
+                            } else {
+                                resultsDiv.append(
+                                    '<div class="alert alert-warning">No data found for the given job title.</div>'
+                                );
+                            }
+                        }
+                    });
+                } else {
+                    $('#results').empty();
+                }
+            });
+
+            $('#search-form').on('submit', function(event) {
+                event.preventDefault();
+                var jobTitle = $('#job_title').val();
                 $.ajax({
                     url: '/search',
                     method: 'POST',
@@ -112,9 +143,9 @@
                     success: function(data) {
                         var resultsDiv = $('#results');
                         resultsDiv.empty();
-                        if (data.length) {
-                            resultsDiv.append('<h4>Results for ' + jobTitle + ':</h4>');
-                            data.forEach(function(item) {
+                        if (data.salaries.length) {
+                            resultsDiv.append('<h4>Results for ' + data.corrected_job_title + ':</h4>');
+                            data.salaries.forEach(function(item) {
                                 resultsDiv.append(
                                     '<div class="result-item"><p><strong>' + item[0] + '</strong> - ' + item[1] + ' ' + item[2] + '</p></div>'
                                 );
