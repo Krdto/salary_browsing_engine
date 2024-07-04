@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, flash
 import pandas as pd
-from fuzzywuzzy import process
+from thefuzz import process
 from currency_converter import CurrencyConverter
 
 app = Flask(__name__)
