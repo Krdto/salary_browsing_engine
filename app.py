@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request, jsonify, flash
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from thefuzz import process
 from currency_converter import CurrencyConverter
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
 
 EXCEL_FILE = 'excelBE.xlsx'
 df = pd.read_excel(EXCEL_FILE)
