@@ -91,36 +91,43 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title">Job Salary Search</h2>
-                <form method="POST">
+                <form id="search-form" method="POST">
                     <div class="form-group">
                         <input type="text" class="form-control" id="job_title" name="job_title" placeholder="Enter job title" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
                 </form>
-                <div class="results">
-                    {% if salaries %}
-                        <h4>Salaries for {{ job_title }}:</h4>
-                        {% for country, salary, currency in salaries %}
-                            <div class="result-item">
-                                <p><strong>{{ country }}</strong> - {{ salary }} {{ currency }}</p>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            <div class="alert alert-warning">
-                                {% for category, message in messages %}
-                                    <p>{{ message }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                </div>
+                <div class="results" id="results"></div>
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#job_title').on('input', function() {
+                var jobTitle = $(this).val();
+                $.ajax({
+                    url: '/search',
+                    method: 'POST',
+                    data: { job_title: jobTitle },
+                    success: function(data) {
+                        var resultsDiv = $('#results');
+                        resultsDiv.empty();
+                        if (data.length) {
+                            resultsDiv.append('<h4>Results for ' + jobTitle + ':</h4>');
+                            data.forEach(function(item) {
+                                resultsDiv.append(
+                                    '<div class="result-item"><p><strong>' + item[0] + '</strong> - ' + item[1] + ' ' + item[2] + '</p></div>'
+                                );
+                            });
+                        } else {
+                            resultsDiv.append(
+                                '<div class="alert alert-warning">No data found for the given job title.</div>'
+                            );
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, jsonify, flash
 import pandas as pd
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
 EXCEL_FILE = 'excelBE.xlsx'
-
 df = pd.read_excel(EXCEL_FILE)
 
 def get_salaries(job_title):
@@ -18,17 +17,13 @@ def get_salaries(job_title):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':
-        job_title = request.form['job_title']
-
-        salaries = get_salaries(job_title)
-
-        if not salaries:
-            flash('No data found for the given job title.', 'warning')
-
-        return render_template('salary_search.html', salaries=salaries, job_title=job_title)
-
     return render_template('salary_search.html')
+
+@app.route('/search', methods=['POST'])
+def search():
+    job_title = request.form['job_title']
+    salaries = get_salaries(job_title)
+    return jsonify(salaries)
 
 if __name__ == '__main__':
     app.run(debug=True)
