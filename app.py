@@ -29,7 +29,7 @@ def get_salaries(job_title):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('salary_search.html')
+    return render_template('index.html')
 
 @app.route('/search', methods=['POST'])
 def search():
