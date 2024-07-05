@@ -27,8 +27,9 @@ def get_salaries(job_title):
     # Liste des intitulés de postes disponibles dans les données
     choices = df['job title'].tolist()
     
-    # Extraction des correspondances pour l'intitulé de poste donné
-    matches = process.extract(job_title, choices)  # Extraire toutes les correspondances sans score_cutoff
+    # Extraction des correspondances pour l'intitulé de poste donné dans une liste de tuples contenant l'intitulé de poste 
+    # et son score de correspondance
+    matches = process.extract(job_title, choices)
     
     # Filtrer les correspondances par un seuil de score raisonnable
     threshold = 60
