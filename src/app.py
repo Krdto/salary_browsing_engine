@@ -3,10 +3,10 @@ import pandas as pd
 from thefuzz import process
 from currency_converter import CurrencyConverter
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates", static_folder="../static")
 
 # Chemin vers le fichier Excel contenant les données
-EXCEL_FILE = 'excelBE.xlsx'
+EXCEL_FILE = 'C:/Users/BENDAVID_E/Desktop/salary_browsing_engine/excelBE.xlsx'
 
 # Chargement des données depuis le fichier Excel
 df = pd.read_excel(EXCEL_FILE)
